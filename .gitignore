@@ -45,6 +45,7 @@ data/raw/*
 
 data/datasets/*
 data/splits/*
+!data/splits/.gitkeep
 data/cache/*
 
 # Audio / Feature caches
