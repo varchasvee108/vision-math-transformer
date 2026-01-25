@@ -19,6 +19,7 @@ class DataConfig:
     num_workers: int
     image_size: List[int]
     seed: int
+    vocab: List[str]
 
 
 @dataclass
