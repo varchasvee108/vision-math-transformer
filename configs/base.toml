@@ -9,6 +9,7 @@ batch_size = 32
 num_workers = 4
 image_size = [128,128]
 seed = 1008
+vocab = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '<SOS>', '<EOS>', '<PAD>']
 
 [model]
 num_layers = 4
