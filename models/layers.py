@@ -106,3 +106,20 @@ class DecoderBlock(nn.Module):
         self.ln3 = nn.LayerNorm(n_embd)
         self.mlp = MLP(config)
         self.dropout = nn.Dropout(config.model.dropout)
+
+    def forward(self, x, encoder_image, mask=None):
+        x_norm = self.ln1(x)
+
+        attn_out, _ = self.attn(
+            x_norm,
+            x_norm,
+            x_norm,
+            attn_mask=mask,
+        )
+        x = x + self.dropout(attn_out)
+        x_norm = self.ln2(x)
+        attn_out, _ = self.cross_attn(x_norm, encoder_image, encoder_image)
+        x = x + self.dropout(attn_out)
+        x_norm = self.ln3(x)
+        x = x + self.dropout(self.mlp(x_norm))
+        return x
