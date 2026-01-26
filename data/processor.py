@@ -27,7 +27,7 @@ class VisionProcessor:
 
     def encode(self, tokens):
         tokens = [self.sos_id] + [self.stoi[token] for token in tokens] + [self.eos_id]
-        return torch.tensor(tokens)
+        return tokens
 
     def decode(self, token_ids):
         if isinstance(token_ids, torch.Tensor):
