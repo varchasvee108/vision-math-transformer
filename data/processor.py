@@ -1,10 +1,11 @@
 import torch
 from torchvision import transforms
 from PIL import Image
+from types import Tuple
 
 
 class VisionProcessor:
-    def __init__(self, image_size, vocab):
+    def __init__(self, image_size: Tuple, vocab):
         self.vocab = vocab
         self.stoi = {ch: i for i, ch in enumerate(vocab)}
         self.itos = {i: ch for i, ch in enumerate(vocab)}
