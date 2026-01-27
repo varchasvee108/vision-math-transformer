@@ -80,3 +80,23 @@ def build_training_components(config: Config) -> TrainingComponents:
     processor = create_processor(config)
     model = create_model(config, device)
     train_dataloader, val_dataloader = create_dataloader(config, processor=processor)
+    optimizer, scheduler = create_optim_and_scheduler(config, model)
+
+    return TrainingComponents(
+        model=model,
+        optimizer=optimizer,
+        lr_scheduler=scheduler,
+        train_dataloader=train_dataloader,
+        val_dataloader=val_dataloader,
+        processor=processor,
+        device=device,
+    )
+
+
+def build_inference_components(
+    config: Config,
+) -> Tuple[torch.nn.Module, VisionMathTransformer, torch.device]:
+    device = get_device()
+    processor = create_processor(config)
+    model = create_model(config, device)
+    return model, processor, device
