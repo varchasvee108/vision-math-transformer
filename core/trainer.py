@@ -14,6 +14,7 @@ class Trainer:
         self.model = components.model
         self.optimizer = components.optimizer
         self.scheduler = components.lr_scheduler
+        self.scaler = components.scaler
         self.train_dataloader = components.train_dataloader
         self.val_dataloader = components.val_dataloader
         self.processor = components.processor
@@ -40,18 +41,23 @@ class Trainer:
         decoder_inputs = labels[:, :-1]
         decoder_targets = labels[:, 1:]
 
-        logits = self.model(images, decoder_inputs)
+        with torch.autocast(
+            device_type=self.device.type, enabled=(self.device.type == "cuda")
+        ):
+            logits = self.model(images, decoder_inputs)
+            loss = F.cross_entropy(
+                logits.view(-1, logits.shape[-1]), decoder_targets.view(-1)
+            )
+            self.optimizer.zero_grad(set_to_none=True)
+            self.scaler.scale(loss).backward()
 
-        loss = F.cross_entropy(
-            logits.view(-1, logits.shape[-1]), decoder_targets.view(-1)
-        )
+            if self.config.training.grad_clip > 0:
+                self.scaler.unscale_(self.optimizer)
+                nn.utils.clip_grad_norm_(
+                    self.model.parameters(), self.config.training.grad_clip
+                )
 
-        self.optimizer.zero_grad()
-        loss.backward()
-        torch.nn.utils.clip_grad_norm_(
-            self.model.parameters(), self.config.training.max_grad_norm
-        )
-        self.optimizer.step()
-        self.scheduler.step()
-
-        return loss.item()
+            self.scaler.step(self.optimizer)
+            self.scaler.update()
+            self.scheduler.step()
+            return loss.item()
