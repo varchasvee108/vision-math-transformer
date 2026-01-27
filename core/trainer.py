@@ -49,15 +49,69 @@ class Trainer:
                 logits.view(-1, logits.shape[-1]), decoder_targets.view(-1)
             )
             self.optimizer.zero_grad(set_to_none=True)
-            self.scaler.scale(loss).backward()
-
-            if self.config.training.grad_clip > 0:
+            if self.scaler is not None:
+                self.scaler.scale(loss).backward()
                 self.scaler.unscale_(self.optimizer)
-                nn.utils.clip_grad_norm_(
-                    self.model.parameters(), self.config.training.grad_clip
+
+                if (
+                    self.config.training.grad_clip is not None
+                    and self.config.training.grad_clip > 0
+                ):
+                    nn.utils.clip_grad_norm_(
+                        self.model.parameters(), self.config.training.grad_clip
+                    )
+
+                self.scaler.step(self.optimizer)
+                self.scaler.update()
+
+            else:
+                loss.backward()
+                if (
+                    self.config.training.grad_clip is not None
+                    and self.config.training.grad_clip > 0
+                ):
+                    nn.utils.clip_grad_norm_(
+                        self.model.parameters(), self.config.training.grad_clip
+                    )
+                self.optimizer.step()
+
+            if self.scheduler:
+                self.scheduler.step()
+
+            return loss.item()
+
+    @torch.no_grad()
+    def evaluate(self):
+        name = "kris"
+
+    def train(self):
+        train_iter = iter(self.train_dataloader)
+        pbar = tqdm(range(self.config.training.max_steps), desc="Training")
+
+        for step in pbar:
+            try:
+                batch = next(train_iter)
+            except StopIteration:
+                train_iter = iter(self.train_dataloader)
+                batch = next(train_iter)
+
+            loss = self.train_step(batch=batch)
+
+            if self.config.logging.use_wandb:
+                wandb.log(
+                    {
+                        "train/loss": loss,
+                        "train/lr": self.optimizer.param_groups[0]["lr"],
+                    },
+                    step=step,
                 )
 
-            self.scaler.step(self.optimizer)
-            self.scaler.update()
-            self.scheduler.step()
-            return loss.item()
+            if step % self.config.training.val_every_steps == 0 and step > 0:
+                val_loss, val_acc = self.evaluate()
+                print(
+                    f"\n Step {step}: Val_loss: {val_loss} | Val_accurary : {val_acc: .4f}"
+                )
+                if self.config.logging.use_wandb:
+                    wandb.log({"val/loss": val_loss, "val/acc": val_acc}, step=step)
+
+            pbar.set_description(f"Loss : {loss:.4f}")
