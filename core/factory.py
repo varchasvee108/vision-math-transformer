@@ -17,6 +17,7 @@ class TrainingComponents:
     model: VisionMathTransformer
     optimizer: torch.optim.Optimizer
     lr_scheduler: LRScheduler
+    scaler: torch.amp.GradScaler
     train_dataloader: DataLoader
     val_dataloader: DataLoader
     processor: VisionProcessor
@@ -81,11 +82,13 @@ def build_training_components(config: Config) -> TrainingComponents:
     model = create_model(config, device)
     train_dataloader, val_dataloader = create_dataloader(config, processor=processor)
     optimizer, scheduler = create_optim_and_scheduler(config, model)
+    scaler = torch.amp.GradScaler(enabled=(device.type == "cuda"))
 
     return TrainingComponents(
         model=model,
         optimizer=optimizer,
         lr_scheduler=scheduler,
+        scaler=scaler,
         train_dataloader=train_dataloader,
         val_dataloader=val_dataloader,
         processor=processor,
