@@ -32,7 +32,7 @@ class VisionMathTransformer(nn.Module):
             x = block(x)
         encoder_output = self.encoder_ln(x)
 
-        B, T = encoder_output.shape
+        B, T = decoder_input_ids.shape
         x = self.decoder_embd(decoder_input_ids)
         x = x + self.decoder_pos_embd(torch.arange(T, device=x.device))
 
