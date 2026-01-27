@@ -46,7 +46,9 @@ class Trainer:
         ):
             logits = self.model(images, decoder_inputs)
             loss = F.cross_entropy(
-                logits.view(-1, logits.shape[-1]), decoder_targets.view(-1)
+                logits.view(-1, logits.shape[-1]),
+                decoder_targets.view(-1),
+                ignore_index=self.processor.pad_id,
             )
             self.optimizer.zero_grad(set_to_none=True)
             if self.scaler is not None:
@@ -96,8 +98,11 @@ class Trainer:
                 logits = self.model(images, decoder_inputs)
 
                 loss = F.cross_entropy(
-                    logits.view(-1, logits.shape[-1]), decoder_targets.view(-1)
+                    logits.view(-1, logits.shape[-1]),
+                    decoder_targets.view(-1),
+                    ignore_index=self.processor.pad_id,
                 )
+
                 total_loss += loss.item()
 
         return total_loss / len(self.val_dataloader)
@@ -125,11 +130,9 @@ class Trainer:
                 )
 
             if step % self.config.training.val_every_steps == 0 and step > 0:
-                val_loss, val_acc = self.evaluate()
-                print(
-                    f"\n Step {step}: Val_loss: {val_loss} | Val_accurary : {val_acc: .4f}"
-                )
+                val_loss = self.evaluate()
+                print(f"\n Step {step}: Val_loss: {val_loss}")
                 if self.config.logging.use_wandb:
-                    wandb.log({"val/loss": val_loss, "val/acc": val_acc}, step=step)
+                    wandb.log({"val/loss": val_loss}, step=step)
 
             pbar.set_description(f"Loss : {loss:.4f}")
