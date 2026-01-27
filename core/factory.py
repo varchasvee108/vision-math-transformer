@@ -95,7 +95,7 @@ def build_training_components(config: Config) -> TrainingComponents:
 
 def build_inference_components(
     config: Config,
-) -> Tuple[torch.nn.Module, VisionMathTransformer, torch.device]:
+) -> Tuple[torch.nn.Module, VisionProcessor, torch.device]:
     device = get_device()
     processor = create_processor(config)
     model = create_model(config, device)
