@@ -1,4 +1,4 @@
-.PHONY train infer docker-build
+.PHONY: train infer docker-build
 
 train:
 	python scripts/train.py --config configs/base.toml
@@ -10,4 +10,4 @@ docker-build:
 	docker build -t vision-math-transformer .
 
 setup:
-	pip install -e
+	pip install -e .
