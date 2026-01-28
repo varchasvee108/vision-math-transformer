@@ -1,0 +1,26 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+    test:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - name: Set up Python 3.10
+              uses: actions/setup-python@v4
+              with:
+                    python-version: 3.11
+            - name: Install dependencies
+              run: 
+                pip install --upgrade pip
+                pip install -e .
+            
+            - name: Run sanity checks
+              run:
+                mkdir -p assets
+                python -c 'From PIL import Image; Image.new("L", (128,128)).save('assets/test.png')'
+                python scripts/infer.py --image_path assets/test.png
+
+                
+
