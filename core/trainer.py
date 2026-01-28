@@ -87,23 +87,22 @@ class Trainer:
         self.model.eval()
         total_loss = 0.0
 
-        with torch.no_grad():
-            for batch in self.val_dataloader:
-                images = batch["image"].to(self.device)
-                labels = batch["target"].to(self.device)
+        for batch in self.val_dataloader:
+            images = batch["image"].to(self.device)
+            labels = batch["target"].to(self.device)
 
-                decoder_inputs = labels[:, :-1]
-                decoder_targets = labels[:, 1:]
+            decoder_inputs = labels[:, :-1]
+            decoder_targets = labels[:, 1:]
 
-                logits = self.model(images, decoder_inputs)
+            logits = self.model(images, decoder_inputs)
 
-                loss = F.cross_entropy(
-                    logits.view(-1, logits.shape[-1]),
-                    decoder_targets.view(-1),
-                    ignore_index=self.processor.pad_id,
-                )
+            loss = F.cross_entropy(
+                logits.view(-1, logits.shape[-1]),
+                decoder_targets.view(-1),
+                ignore_index=self.processor.pad_id,
+            )
 
-                total_loss += loss.item()
+            total_loss += loss.item()
 
         return total_loss / len(self.val_dataloader)
 
