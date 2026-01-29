@@ -70,7 +70,7 @@ def create_optim_and_scheduler(
         config.training.scheduler,
         optimizer,
         num_warmup_steps=config.training.warmup_steps,
-        num_training_steps=config.training.num_training_steps,
+        num_training_steps=config.training.max_steps,
     )
 
     return optimizer, scheduler
