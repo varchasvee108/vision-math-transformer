@@ -18,3 +18,18 @@ def test_patch_embedding():
     expected_tokens = grid * grid
     assert y.shape == (B, expected_tokens, config.model.n_embd)
     assert torch.isfinite(y).all()
+
+
+def encoder_layer_test():
+    config = Config.load("configs/base.toml")
+    layer = EncoderBlock(config)
+
+    B = 12
+    N = 20
+
+    x = torch.randn(B, N, config.model.n_embd)
+
+    y = layer(x)
+
+    assert y.shape == x.shape
+    assert torch.isfinite(y).all()
