@@ -33,3 +33,20 @@ def encoder_layer_test():
 
     assert y.shape == x.shape
     assert torch.isfinite(y).all()
+
+
+def decoder_layer_test():
+    config = Config.load("configs/base.toml")
+    layer = DecoderBlock(config=config)
+
+    B = 18
+    T = 4
+    N = 16
+
+    decoder_x = torch.randn(B, T, config.model.n_embd)
+    encoder_x = torch.randn(B, N, config.model.n_embd)
+
+    y = layer(decoder_x, encoder_x)
+
+    assert y.shape == decoder_x.shape
+    assert torch.isfinite(y).all()
