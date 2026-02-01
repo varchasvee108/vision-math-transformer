@@ -32,9 +32,9 @@ class VisionMathTransformer(nn.Module):
         assert image_tensor.device == decoder_input_ids.device
 
         B_img = image_tensor.shape[0]
-        B_dec, T = decoder_input_ids.shape
+        B_dec, T_dec = decoder_input_ids.shape
         assert B_img == B_dec
-        assert T <= self.config.model.max_seq_len
+        assert T_dec <= self.config.model.max_seq_len
 
         x = self.patch_embd(image_tensor)
 
