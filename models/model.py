@@ -27,7 +27,17 @@ class VisionMathTransformer(nn.Module):
         return torch.triu(torch.full((T, T), float("-inf"), device=device), diagonal=1)
 
     def forward(self, image_tensor, decoder_input_ids):
+        assert image_tensor.ndim == 4
+        assert decoder_input_ids.ndim == 3
+        assert image_tensor.device == decoder_input_ids.device
+
+        B_img = image_tensor.shape[0]
+        B_dec, T = decoder_input_ids.shape
+        assert B_img == B_dec
+        assert T <= self.config.model.max_seq_len
+
         x = self.patch_embd(image_tensor)
+
         for block in self.encoder_blocks:
             x = block(x)
         encoder_output = self.encoder_ln(x)
