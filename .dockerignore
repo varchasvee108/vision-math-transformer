@@ -1,0 +1,37 @@
+# --- Version Control ---
+.git
+.gitignore
+.github
+
+# --- Python & ML Junk ---
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ipynb_checkpoints/
+.venv/
+venv/
+env/
+.env
+.env.local
+
+# --- Project Specific Large Files ---
+# Ignore raw data and logs to keep the image small
+data/
+logs/
+results/
+tests/
+
+# Ignore local checkpoints (usually handled via volumes or explicit COPY)
+checkpoints/
+*.pth
+*.pt
+*.bin
+
+# --- Build & OS Artifacts ---
+build/
+dist/
+.DS_Store
+Thumbs.db
+
