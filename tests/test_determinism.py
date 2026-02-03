@@ -1,11 +1,15 @@
 import torch
 from core.config import Config
 from models.model import VisionMathTransformer
+from data.processor import VisionProcessor
 
 
 def test_deterministic_forward():
     config = Config.load("configs/base.toml")
-    model = VisionMathTransformer(config)
+    processor = VisionProcessor(
+        image_size=config.data.image_size, vocab=config.data.vocab
+    )
+    model = VisionMathTransformer(config, pad_id=processor.pad_id)
 
     model.eval()
 
