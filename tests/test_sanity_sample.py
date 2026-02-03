@@ -2,8 +2,10 @@ import torch
 from PIL import Image
 from core.config import Config
 from core.factory import build_inference_components
+import pytest
 
 
+@pytest.mark.integration
 def test_sanity_sample():
     config = Config.load("configs/base.toml")
 

@@ -20,7 +20,7 @@ def test_patch_embedding():
     assert torch.isfinite(y).all()
 
 
-def encoder_layer_test():
+def test_encoder_layer_test():
     config = Config.load("configs/base.toml")
     layer = EncoderBlock(config)
 
@@ -35,7 +35,7 @@ def encoder_layer_test():
     assert torch.isfinite(y).all()
 
 
-def decoder_layer_test():
+def test_decoder_layer_test():
     config = Config.load("configs/base.toml")
     layer = DecoderBlock(config=config)
 

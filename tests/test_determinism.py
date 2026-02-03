@@ -3,6 +3,8 @@ from core.config import Config
 from models.model import VisionMathTransformer
 from data.processor import VisionProcessor
 
+torch.use_deterministic_algorithms(True)
+
 
 def test_deterministic_forward():
     config = Config.load("configs/base.toml")
