@@ -29,7 +29,7 @@ class Trainer:
             wandb.init(
                 project=config.logging.project_name,
                 name=config.project.experiment_name,
-                config=config,
+                config=asdict(config),
             )
 
     def save_checkpoint(self, step, val_loss, is_best=False):
@@ -38,7 +38,7 @@ class Trainer:
             "model_state_dict": self.model.state_dict(),
             "optimizer_state_dict": self.optimizer.state_dict(),
             "scheduler_state_dict": self.scheduler.state_dict(),
-            "scaler_state_dict": self.scaler.state_dict(),
+            "scaler_state_dict": self.scaler.state_dict() if self.scaler else None,
             "val_loss": val_loss,
             "best_val_loss": self.best_val_loss,
             "config": asdict(self.config),

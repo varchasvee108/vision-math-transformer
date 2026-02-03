@@ -31,7 +31,7 @@ class VisionMathTransformer(nn.Module):
         encoder_attn_maps = []
         decoder_attn_maps = []
         assert image_tensor.ndim == 4
-        assert decoder_input_ids.ndim == 3
+        assert decoder_input_ids.ndim == 2
         assert image_tensor.device == decoder_input_ids.device
         pad_mask = decoder_input_ids == self.pad_id
 

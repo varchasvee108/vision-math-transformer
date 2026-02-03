@@ -1,7 +1,7 @@
 import torch
 from torchvision import transforms
 from PIL import Image
-from types import Tuple
+from typing import Tuple
 
 
 class VisionProcessor:
