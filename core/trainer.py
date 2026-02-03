@@ -19,6 +19,7 @@ class Trainer:
         self.val_dataloader = components.val_dataloader
         self.processor = components.processor
         self.device = components.device
+        self.best_val_loss = float("inf")
 
         self.exp_dir = Path("experiments") / config.project.experiment_name
         self.exp_dir.mkdir(parents=True, exist_ok=True)
@@ -29,6 +30,25 @@ class Trainer:
                 name=config.project.experiment_name,
                 config=config,
             )
+
+    def save_checkpoint(self, step, val_loss, is_best=False):
+        checkpoint = {
+            "step": step,
+            "model_state_dict": self.model.state_dict(),
+            "optimizer_state_dict": self.optimizer.state_dict(),
+            "scheduler_state_dict": self.scheduler.state_dict(),
+            "scaler_state_dict": self.scaler.state_dict(),
+            "val_loss": val_loss,
+            "best_val_loss": self.best_val_loss,
+            "config": self.config,
+        }
+        latest_path = Path(self.exp_dir / "latest.pth")
+        torch.save(checkpoint, latest_path)
+
+        if is_best:
+            best_path = Path(self.exp_dir / "best.pth")
+            torch.save(checkpoint, best_path)
+            print(f"Best checkpoint saved at {best_path}")
 
     def train_step(self, batch):
         self.model.train()
@@ -130,6 +150,12 @@ class Trainer:
 
             if step % self.config.training.val_every_steps == 0 and step > 0:
                 val_loss = self.evaluate()
+
+                is_best = val_loss < self.best_val_loss
+                if is_best:
+                    self.best_val_loss = val_loss
+                self.save_checkpoint(step, val_loss, is_best)
+
                 print(f"\n Step {step}: Val_loss: {val_loss}")
                 if self.config.logging.use_wandb:
                     wandb.log({"val/loss": val_loss}, step=step)
