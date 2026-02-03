@@ -27,7 +27,8 @@ class VisionMathTransformer(nn.Module):
     def generate_causal_mask(self, T, device):
         return torch.triu(torch.full((T, T), float("-inf"), device=device), diagonal=1)
 
-    def forward(self, image_tensor, decoder_input_ids):
+    def forward(self, image_tensor, decoder_input_ids, return_attn=False):
+        attn_maps = []
         assert image_tensor.ndim == 4
         assert decoder_input_ids.ndim == 3
         assert image_tensor.device == decoder_input_ids.device
@@ -41,7 +42,11 @@ class VisionMathTransformer(nn.Module):
         x = self.patch_embd(image_tensor)
 
         for block in self.encoder_blocks:
-            x = block(x)
+            if return_attn:
+                x, attn_map = block(x, return_attn=True)
+                attn_maps.append(attn_map)
+            else:
+                x = block(x)
         encoder_output = self.encoder_ln(x)
 
         B, T = decoder_input_ids.shape
@@ -54,4 +59,6 @@ class VisionMathTransformer(nn.Module):
             x = block(x, encoder_output, causal_mask, padding_mask=pad_mask)
         x = self.decoder_ln(x)
         logits = self.head(x)
+        if return_attn:
+            return logits, attn_maps
         return logits
