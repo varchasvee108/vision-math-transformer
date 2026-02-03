@@ -1,0 +1,41 @@
+[build-system]
+requires = ['setuptools']
+build-backend = 'setuptools.build_meta'
+
+[project]
+name = 'vision-transformer'
+version = '0.1.0'
+requires-python = '>=3.11'
+dependencies = [
+    'torch',
+    'torchvision',
+    'transformers',
+    'pycocotools',
+    'pillow',
+    'plotly',
+    'numpy',
+    'imageio',
+    'tqdm',
+    'wandb',
+    'pytest'
+]
+
+[tool.pytest.ini_options]
+markers = [
+    "integration: slow or end-to-end tests"
+]
+
+[tool.setuptools.packages.find]
+include = [
+    "core",
+    "core.*",
+    "models",
+    "models.*",
+    "data",
+    "data.*",
+    "datasets",
+    "datasets.*",
+    "visuals",
+    "visuals.*",
+]
+exclude = ["configs", "experiments", "tests", "tests.*", "scripts", "scripts.*"]
