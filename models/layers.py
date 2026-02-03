@@ -91,6 +91,7 @@ class DecoderBlock(nn.Module):
         n_embd = config.model.n_embd
         self.ln1 = nn.LayerNorm(n_embd)
         self.ln2 = nn.LayerNorm(n_embd)
+        self.ln3 = nn.LayerNorm(n_embd)
         self.attn = nn.MultiheadAttention(
             n_embd,
             num_heads=config.model.num_heads,
@@ -103,7 +104,6 @@ class DecoderBlock(nn.Module):
             dropout=config.model.dropout,
             batch_first=True,
         )
-        self.ln3 = nn.LayerNorm(n_embd)
         self.mlp = MLP(config)
         self.dropout = nn.Dropout(config.model.dropout)
 
