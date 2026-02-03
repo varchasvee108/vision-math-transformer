@@ -81,7 +81,7 @@ class EncoderBlock(nn.Module):
         x = x + self.dropout(self.mlp(self.ln2(x)))
 
         if return_attn:
-            return x, attn_weights
+            return x, {"self_attn": attn_weights}
         return x
 
 

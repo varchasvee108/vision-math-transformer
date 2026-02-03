@@ -28,7 +28,8 @@ class VisionMathTransformer(nn.Module):
         return torch.triu(torch.full((T, T), float("-inf"), device=device), diagonal=1)
 
     def forward(self, image_tensor, decoder_input_ids, return_attn=False):
-        attn_maps = []
+        encoder_attn_maps = []
+        decoder_attn_maps = []
         assert image_tensor.ndim == 4
         assert decoder_input_ids.ndim == 3
         assert image_tensor.device == decoder_input_ids.device
@@ -43,8 +44,8 @@ class VisionMathTransformer(nn.Module):
 
         for block in self.encoder_blocks:
             if return_attn:
-                x, attn_map = block(x, return_attn=True)
-                attn_maps.append(attn_map)
+                x, encoder_attn = block(x, return_attn=True)
+                encoder_attn_maps.append(encoder_attn)
             else:
                 x = block(x)
         encoder_output = self.encoder_ln(x)
@@ -56,9 +57,19 @@ class VisionMathTransformer(nn.Module):
         causal_mask = self.generate_causal_mask(T, device=x.device)
 
         for block in self.decoder_blocks:
-            x = block(x, encoder_output, causal_mask, padding_mask=pad_mask)
+            if return_attn:
+                x, attn = block(
+                    x,
+                    encoder_output,
+                    causal_mask,
+                    padding_mask=pad_mask,
+                    return_attn=True,
+                )
+                decoder_attn_maps.append(attn)
+            else:
+                x = block(x, encoder_output, causal_mask, padding_mask=pad_mask)
         x = self.decoder_ln(x)
         logits = self.head(x)
         if return_attn:
-            return logits, attn_maps
+            return logits, {"encoder": encoder_attn_maps, "decoder": decoder_attn_maps}
         return logits
