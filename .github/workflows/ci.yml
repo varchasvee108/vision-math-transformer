@@ -16,12 +16,12 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: "3.11"
+          cache: "pip"
 
       - name: Install dependencies
         run: |
           pip install --upgrade pip
           pip install -e .
-          pip install pytest
 
       - name: Run unit tests(excludes integration)
         run: |
