@@ -2,6 +2,7 @@ import argparse
 from core.config import Config
 from core.factory import build_training_components
 from core.trainer import Trainer
+from core.seed import set_seed
 
 
 def main():
@@ -14,6 +15,7 @@ def main():
     )
     args = parser.parse_args()
     config = Config.load(args.config)
+    set_seed(config.data.seed)
     components = build_training_components(config)
     trainer = Trainer(config, components)
 
