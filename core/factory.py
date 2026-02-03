@@ -38,8 +38,8 @@ def create_processor(config: Config):
     )
 
 
-def create_model(config: Config, device: torch.device):
-    model = VisionMathTransformer(config).to(device)
+def create_model(config: Config, device: torch.device, pad_id: int):
+    model = VisionMathTransformer(config, pad_id).to(device)
     return model
 
 
@@ -79,7 +79,7 @@ def create_optim_and_scheduler(
 def build_training_components(config: Config) -> TrainingComponents:
     device = get_device()
     processor = create_processor(config)
-    model = create_model(config, device)
+    model = create_model(config, device, pad_id=processor.pad_id)
     train_dataloader, val_dataloader = create_dataloader(config, processor=processor)
     optimizer, scheduler = create_optim_and_scheduler(config, model)
     scaler = torch.amp.GradScaler(enabled=(device.type == "cuda"))

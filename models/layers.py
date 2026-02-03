@@ -107,7 +107,7 @@ class DecoderBlock(nn.Module):
         self.mlp = MLP(config)
         self.dropout = nn.Dropout(config.model.dropout)
 
-    def forward(self, x, encoder_image, mask=None):
+    def forward(self, x, encoder_image, mask=None, padding_mask=None):
         x_norm = self.ln1(x)
 
         attn_out, _ = self.attn(
@@ -115,6 +115,8 @@ class DecoderBlock(nn.Module):
             x_norm,
             x_norm,
             attn_mask=mask,
+            key_padding_mask=padding_mask,
+            need_weights=False,
         )
         x = x + self.dropout(attn_out)
         x_norm = self.ln2(x)
