@@ -30,6 +30,7 @@ class Trainer:
                 project=config.logging.project_name,
                 name=config.project.experiment_name,
                 config=asdict(config),
+                mode="online" if config.logging.use_wandb else "disabled",
             )
 
     def save_checkpoint(self, step, val_loss, is_best=False):
