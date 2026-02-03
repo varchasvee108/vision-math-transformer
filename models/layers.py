@@ -118,7 +118,6 @@ class DecoderBlock(nn.Module):
             x_norm,
             attn_mask=mask,
             key_padding_mask=padding_mask,
-            need_weights=return_attn,
         )
         x = x + self.dropout(attn_out)
         x_norm = self.ln2(x)
@@ -133,7 +132,6 @@ class DecoderBlock(nn.Module):
         x = x + self.dropout(self.mlp(x_norm))
         if return_attn:
             return x, {
-                "self_attn": self_attn_weights,
                 "cross_attn": cross_attn_weights,
             }
         return x
