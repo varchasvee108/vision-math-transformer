@@ -82,7 +82,7 @@ def build_training_components(config: Config) -> TrainingComponents:
     model = create_model(config, device, pad_id=processor.pad_id)
     train_dataloader, val_dataloader = create_dataloader(config, processor=processor)
     optimizer, scheduler = create_optim_and_scheduler(config, model)
-    scaler = torch.amp.GradScaler(enabled=(device.type == "cuda"))
+    scaler = torch.amp.GradScaler() if device.type == "cuda" else None
 
     return TrainingComponents(
         model=model,
@@ -101,5 +101,5 @@ def build_inference_components(
 ) -> Tuple[torch.nn.Module, VisionProcessor, torch.device]:
     device = get_device()
     processor = create_processor(config)
-    model = create_model(config, device)
+    model = create_model(config, device, pad_id=processor.pad_id)
     return model, processor, device
