@@ -6,10 +6,11 @@ from data.processor import VisionProcessor
 
 
 class VisionMathTransformer(nn.Module):
-    def __init__(self, config: Config):
+    def __init__(self, config: Config, pad_id: int):
         super().__init__()
         self.config = config
         self.n_embd = config.model.n_embd
+        self.pad_id = pad_id
         self.patch_embd = PatchEmbedding(config)
         self.encoder_blocks = nn.ModuleList(
             [EncoderBlock(config) for _ in range(config.model.num_layers)]
@@ -30,6 +31,7 @@ class VisionMathTransformer(nn.Module):
         assert image_tensor.ndim == 4
         assert decoder_input_ids.ndim == 3
         assert image_tensor.device == decoder_input_ids.device
+        pad_mask = decoder_input_ids == self.pad_id
 
         B_img = image_tensor.shape[0]
         B_dec, T_dec = decoder_input_ids.shape
@@ -49,7 +51,7 @@ class VisionMathTransformer(nn.Module):
         causal_mask = self.generate_causal_mask(T, device=x.device)
 
         for block in self.decoder_blocks:
-            x = block(x, encoder_output, causal_mask)
+            x = block(x, encoder_output, causal_mask, padding_mask=pad_mask)
         x = self.decoder_ln(x)
         logits = self.head(x)
         return logits
