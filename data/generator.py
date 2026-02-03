@@ -62,7 +62,7 @@ def generate_raw_data():
     dataset = []
     image_size = tuple(config.data.image_size)
 
-    processor = VisionProcessor(image_size == image_size, vocab=config.data.vocab)
+    processor = VisionProcessor(image_size=image_size, vocab=config.data.vocab)
 
     for i in range(args.num_samples):
         img, tokens, result = generate_single_image(image_size, processor=processor)
