@@ -18,12 +18,12 @@ jobs:
         run: |
           pip install --upgrade pip
           pip install -e .
+          pip install pytest
 
-      - name: Run sanity checks
+      - name: Run unit tests(excludes integration)
         run: |
-          mkdir -p assets
-          python - <<EOF
-          from PIL import Image
-          Image.new("L", (128, 128)).save("assets/test.png")
-          EOF
-          python scripts/infer.py --image_path assets/test.png
+          pytest tests -m "not integration"
+
+      # - name: Run integration tests
+      #   run: |
+      #     pytest tests -m "integration"
