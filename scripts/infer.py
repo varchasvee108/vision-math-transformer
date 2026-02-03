@@ -12,6 +12,7 @@ def infer(
     config = Config.load(config_path)
     model, processor, device = build_inference_components(config=config)
     model.load_state_dict(torch.load(model_weights, map_location=device))
+    model.eval()
 
     img = Image.open(image_path).convert("L")
     pixel_values = processor.process_image(img).unsqueeze(0).to(device)

@@ -1,11 +1,17 @@
 import torch
 from core.config import Config
 from models.model import VisionMathTransformer
+from data.processor import VisionProcessor
 
 
-def test_model_output_shape(path="configs/base.toml"):
+def test_model_output_shape(
+    path="configs/base.toml",
+):
     config = Config.load(path)
-    model = VisionMathTransformer(config)
+    processor = VisionProcessor(
+        image_size=config.data.image_size, vocab=config.data.vocab
+    )
+    model = VisionMathTransformer(config, pad_id=processor.pad_id)
     B = 2
     H, W = config.data.image_size
     T = 4

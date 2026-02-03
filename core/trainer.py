@@ -6,6 +6,7 @@ from tqdm import tqdm
 from pathlib import Path
 from core.factory import TrainingComponents
 from core.config import Config
+from dataclasses import asdict
 
 
 class Trainer:
@@ -40,7 +41,7 @@ class Trainer:
             "scaler_state_dict": self.scaler.state_dict(),
             "val_loss": val_loss,
             "best_val_loss": self.best_val_loss,
-            "config": self.config,
+            "config": asdict(self.config),
         }
         latest_path = Path(self.exp_dir / "latest.pth")
         torch.save(checkpoint, latest_path)
