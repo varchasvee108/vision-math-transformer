@@ -25,7 +25,7 @@ class VisionMathTransformer(nn.Module):
         self.head = nn.Linear(self.n_embd, len(config.data.vocab))
 
     def generate_causal_mask(self, T, device):
-        return torch.triu(torch.full((T, T), float("-inf"), device=device), diagonal=1)
+        return torch.triu(torch.full((T, T), torch.bool, device=device), diagonal=1)
 
     def forward(self, image_tensor, decoder_input_ids, return_attn=False):
 
