@@ -20,10 +20,10 @@ def test_deterministic_forward():
     T = 4
     vocab_size = len(config.data.vocab)
 
+    torch.manual_seed(1008)
     image_tensor = torch.randn(B, 1, H, W)
     decoder_input_ids = torch.randint(0, vocab_size, (B, T))
 
-    torch.manual_seed(1008)
     with torch.inference_mode():
         y1 = model(image_tensor, decoder_input_ids)
 
