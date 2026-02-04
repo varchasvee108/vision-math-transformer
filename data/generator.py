@@ -36,18 +36,12 @@ def generate_single_image(
     draw.text((rand_x, center_y), text=query_text, fill=0, font=font)
 
     answer_str = str(result)
-    digits = list(answer_str)
+    answer_tokens = processor.encode(answer_str)
 
-    tokens = [processor.sos_id]
+    while len(answer_tokens) < max_digits + 2:
+        answer_tokens.append(processor.pad_id)
 
-    for d in digits[:max_digits]:
-        tokens.append(processor.stoi[d])
-
-    while len(tokens) < max_digits + 1:
-        tokens.append(processor.pad_id)
-    tokens.append(processor.eos_id)
-
-    return img, tokens, result
+    return img, answer_tokens, result
 
 
 def generate_raw_data():
