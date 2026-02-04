@@ -25,3 +25,12 @@ run-cuda:
 
 setup:
 	pip install -e .
+
+test-unit:
+		pytest tests -m "not integration"
+
+test-integration:
+		pytest tests -m "integration"
+
+test-all:
+		pytest tests
