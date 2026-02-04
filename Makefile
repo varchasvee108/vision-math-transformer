@@ -1,10 +1,10 @@
 .PHONY: train setup infer docker-cpu docker-cuda run-cpu run-cuda
 
 train:
-	python scripts.train --config configs/base.toml
+	python -m scripts.train --config configs/base.toml
 
 infer:
-	python scripts.infer --image_path assets/test.png
+	python -m scripts.infer --image_path assets/test.png
 
 docker-cpu:
 	docker build -f Dockerfile.cpu -t vision-math-transformer:cpu .
